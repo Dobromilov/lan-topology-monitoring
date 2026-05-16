@@ -23,4 +23,21 @@ func main() {
 	defer database.Close()
 
 	fmt.Println("PostgreSQL connection is OK")
+
+	hosts, err := db.ListHosts(ctx, database)
+	if err != nil {
+		log.Fatalf("failed to load hosts: %v", err)
+	}
+
+	fmt.Println("Hosts:")
+	for _, host := range hosts {
+		fmt.Printf(
+			"- #%d %s | IP: %s | MAC: %s | status: %s\n",
+			host.HostID,
+			host.Hostname,
+			host.IPAddress,
+			host.MACAddress,
+			host.Status,
+		)
+	}
 }
