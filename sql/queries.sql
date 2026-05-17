@@ -47,3 +47,28 @@ FROM hosts h
 LEFT JOIN frames f ON h.host_id = f.src_host_id
 GROUP BY h.hostname
 ORDER BY frames_sent DESC;
+
+-- 5. Активные подключения через представление
+SELECT *
+FROM v_active_connections
+ORDER BY switch_id, port_number;
+
+-- 6. MAC-таблица коммутатора через функцию
+SELECT *
+FROM get_switch_mac_table('Core-Switch-01');
+
+-- 7. Трассировка конкретного кадра через функцию
+SELECT *
+FROM get_frame_trace(1);
+
+-- 8. Общая статистика трафика по хостам через функцию
+SELECT *
+FROM get_host_traffic_stats();
+
+-- 9. Регистрация нового кадра средствами БД
+-- Функция сама найдет активные подключения хостов, создаст запись в frames,
+-- создаст запись в frame_path и вернет frame_id.
+-- Пример обернут в транзакцию с ROLLBACK, чтобы не менять базу при демонстрации.
+BEGIN;
+SELECT register_frame(1, 2, 'IPv4', 128, 'delivered') AS new_frame_id;
+ROLLBACK;
