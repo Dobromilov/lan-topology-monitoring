@@ -1,0 +1,662 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+\geometry{left=2cm,right=1.5cm,top=2cm,bottom=2cm}
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0.2em}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray},
+    stringstyle=\color{purple},
+    breaklines=true,
+    frame=single,
+    showstringspaces=false,
+    columns=fullflexible
+}
+
+\lstset{style=sqlstyle}
+
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \footnotesize
+    Министерство цифрового развития, связи и массовых коммуникаций РФ\\
+    Федеральное государственное образовательное учреждение высшего образования\\
+    «Сибирский государственный университет телекоммуникаций и информатики»\\
+    (СибГУТИ)
+
+    \vspace{4cm}
+
+    \Large \textbf{ОТЧЕТ}\\
+    \large по расчетно-графической работе\\
+    по дисциплине «Базы данных»\\
+    \textbf{«Проектирование и реализация базы данных»}
+
+    \vspace{1cm}
+
+    \large
+    \textbf{Тема:}\\
+    «Система учета сетевой топологии и передачи трафика в локальной сети»
+
+    \vspace{4cm}
+
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \textbf{Выполнили:}\\
+        студенты группы ИКС-433\\
+        Криволапов Н.\\
+        Добромилов А.
+
+        \vspace{1cm}
+
+        \textbf{Проверил:}\\
+        Брагин К.И.
+    \end{minipage}
+
+    \vfill
+
+    Новосибирск 2026
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Цель работы}
+
+Целью расчетно-графической работы является проектирование и реализация реляционной базы данных в СУБД PostgreSQL для предметной области, связанной с телекоммуникационными технологиями и IT-инфраструктурой.
+
+В рамках работы требуется:
+\begin{itemize}
+    \item описать выбранную предметную область;
+    \item спроектировать структуру базы данных;
+    \item реализовать таблицы, первичные и внешние ключи;
+    \item добавить ограничения целостности, индексы, представления, функции и триггеры;
+    \item подготовить тестовое наполнение базы данных;
+    \item разработать набор функциональных и аналитических SQL-запросов;
+    \item обеспечить запуск PostgreSQL через Docker Compose.
+\end{itemize}
+
+\section{Описание предметной области}
+
+В качестве предметной области выбрана система учета сетевой топологии и передачи трафика в локальной сети. Такая система может использоваться как часть NMS (Network Management System) для хранения информации об узлах сети, коммутаторах, портах, подключениях, MAC-таблице и событиях передачи Ethernet-кадров.
+
+В локальной сети рабочие станции и серверы подключаются к портам коммутаторов. Коммутатор выполняет пересылку Ethernet-кадров между портами, используя MAC-таблицу. MAC-таблица содержит сведения о том, какой MAC-адрес был замечен на каком порту. При передаче кадра система фиксирует отправителя, получателя, MAC-адреса, тип кадра, размер полезной нагрузки и путь прохождения кадра через сетевое оборудование.
+
+Основные автоматизируемые задачи:
+\begin{itemize}
+    \item ведение реестра сетевых хостов;
+    \item учет коммутаторов и их портов;
+    \item учет активных подключений хостов к портам;
+    \item хранение MAC-таблицы коммутаторов;
+    \item регистрация фактов передачи кадров;
+    \item хранение пути прохождения кадров через порты коммутаторов;
+    \item построение аналитических отчетов по топологии и трафику.
+\end{itemize}
+
+\section{Логическая модель базы данных}
+
+База данных содержит 7 основных таблиц:
+\begin{enumerate}
+    \item \texttt{hosts} --- хосты локальной сети;
+    \item \texttt{switches} --- сетевые коммутаторы;
+    \item \texttt{switch\_ports} --- порты коммутаторов;
+    \item \texttt{host\_connections} --- подключения хостов к портам;
+    \item \texttt{mac\_table} --- MAC-таблица коммутаторов;
+    \item \texttt{frames} --- Ethernet-кадры;
+    \item \texttt{frame\_path} --- путь прохождения кадров.
+\end{enumerate}
+
+\subsection{ER-диаграмма}
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[
+    entity/.style={draw, rounded corners, align=left, inner sep=6pt, font=\small, fill=gray!5},
+    rel/.style={-{Latex[length=3mm]}, thick}
+]
+    \node[entity] (hosts) {
+        \textbf{hosts}\\
+        \underline{host\_id}\\
+        hostname\\
+        ip\_address\\
+        mac\_address\\
+        status\\
+        created\_at
+    };
+
+    \node[entity, right=3.2cm of hosts] (connections) {
+        \textbf{host\_connections}\\
+        \underline{connection\_id}\\
+        host\_id\\
+        port\_id\\
+        connected\_at\\
+        disconnected\_at
+    };
+
+    \node[entity, right=3.2cm of connections] (ports) {
+        \textbf{switch\_ports}\\
+        \underline{port\_id}\\
+        switch\_id\\
+        port\_number\\
+        status\\
+        speed\_mbps
+    };
+
+    \node[entity, right=3.2cm of ports] (switches) {
+        \textbf{switches}\\
+        \underline{switch\_id}\\
+        name\\
+        model\\
+        ports\_count\\
+        location\\
+        created\_at
+    };
+
+    \node[entity, below=2.3cm of ports] (mac) {
+        \textbf{mac\_table}\\
+        \underline{entry\_id}\\
+        port\_id\\
+        mac\_address\\
+        learned\_at\\
+        last\_seen\_at\\
+        is\_static
+    };
+
+    \node[entity, below=2.7cm of hosts] (frames) {
+        \textbf{frames}\\
+        \underline{frame\_id}\\
+        src\_host\_id\\
+        dst\_host\_id\\
+        src\_mac\\
+        dst\_mac\\
+        ether\_type\\
+        payload\_size\\
+        sent\_at\\
+        delivery\_status
+    };
+
+    \node[entity, below=2.7cm of connections] (path) {
+        \textbf{frame\_path}\\
+        \underline{path\_id}\\
+        frame\_id\\
+        switch\_id\\
+        in\_port\_id\\
+        out\_port\_id\\
+        step\_number\\
+        processed\_at
+    };
+
+    \draw[rel] (connections) -- node[above, font=\scriptsize]{N:1 host\_id} (hosts);
+    \draw[rel] (connections) -- node[above, font=\scriptsize]{N:1 port\_id} (ports);
+    \draw[rel] (ports) -- node[above, font=\scriptsize]{N:1 switch\_id} (switches);
+    \draw[rel] (mac) -- node[right, font=\scriptsize]{N:1 port\_id} (ports);
+    \draw[rel] (frames) -- node[left, font=\scriptsize]{N:1 src/dst host} (hosts);
+    \draw[rel] (path) -- node[above, font=\scriptsize]{N:1 frame\_id} (frames);
+    \draw[rel] (path) -- node[right, font=\scriptsize]{N:1 switch\_id} (switches);
+    \draw[rel] (path) -- node[right, font=\scriptsize]{N:1 in/out ports} (ports);
+\end{tikzpicture}
+}
+\caption{ER-диаграмма базы данных с кратностями связей}
+\end{figure}
+
+\subsection{Связи между таблицами}
+
+\begin{longtable}{|p{4.7cm}|p{4.7cm}|p{1.6cm}|p{4.1cm}|}
+\hline
+\textbf{Дочерняя таблица и внешний ключ} & \textbf{Родительская таблица и первичный ключ} & \textbf{Кратность} & \textbf{Смысл связи}\\
+\hline
+\texttt{host\_connections.host\_id} & \texttt{hosts.host\_id} & N:1 & Один хост может иметь несколько записей истории подключений.\\
+\hline
+\texttt{host\_connections.port\_id} & \texttt{switch\_ports.port\_id} & N:1 & Один порт может встречаться в истории подключений.\\
+\hline
+\texttt{switch\_ports.switch\_id} & \texttt{switches.switch\_id} & N:1 & Один коммутатор содержит много портов.\\
+\hline
+\texttt{mac\_table.port\_id} & \texttt{switch\_ports.port\_id} & N:1 & На одном порту может быть изучено несколько MAC-адресов.\\
+\hline
+\texttt{frames.src\_host\_id} & \texttt{hosts.host\_id} & N:1 & Хост может быть отправителем многих кадров.\\
+\hline
+\texttt{frames.dst\_host\_id} & \texttt{hosts.host\_id} & N:1 & Хост может быть получателем многих кадров.\\
+\hline
+\texttt{frame\_path.frame\_id} & \texttt{frames.frame\_id} & N:1 & Один кадр может иметь несколько шагов пути.\\
+\hline
+\texttt{frame\_path.switch\_id} & \texttt{switches.switch\_id} & N:1 & Один коммутатор может участвовать во многих шагах прохождения кадров.\\
+\hline
+\texttt{frame\_path.in\_port\_id} & \texttt{switch\_ports.port\_id} & N:1 & Порт может быть входным для многих шагов прохождения кадров.\\
+\hline
+\texttt{frame\_path.out\_port\_id} & \texttt{switch\_ports.port\_id} & N:1 & Порт может быть выходным для многих шагов прохождения кадров.\\
+\hline
+\end{longtable}
+
+\subsection{Описание таблиц}
+
+\begin{longtable}{|p{3.2cm}|p{4.2cm}|p{7.5cm}|}
+\hline
+\textbf{Таблица} & \textbf{Назначение} & \textbf{Ключевые поля}\\
+\hline
+\texttt{hosts} & Хранит конечные устройства сети & \texttt{host\_id}, \texttt{hostname}, \texttt{ip\_address}, \texttt{mac\_address}, \texttt{status}\\
+\hline
+\texttt{switches} & Хранит сведения о коммутаторах & \texttt{switch\_id}, \texttt{name}, \texttt{model}, \texttt{ports\_count}, \texttt{location}\\
+\hline
+\texttt{switch\_ports} & Описывает физические порты коммутаторов & \texttt{port\_id}, \texttt{switch\_id}, \texttt{port\_number}, \texttt{status}, \texttt{speed\_mbps}\\
+\hline
+\texttt{host\_connections} & Фиксирует подключение хоста к порту & \texttt{connection\_id}, \texttt{host\_id}, \texttt{port\_id}, \texttt{connected\_at}, \texttt{disconnected\_at}\\
+\hline
+\texttt{mac\_table} & Хранит MAC-таблицу коммутаторов & \texttt{entry\_id}, \texttt{port\_id}, \texttt{mac\_address}, \texttt{learned\_at}, \texttt{last\_seen\_at}\\
+\hline
+\texttt{frames} & Хранит факты передачи Ethernet-кадров & \texttt{frame\_id}, \texttt{src\_host\_id}, \texttt{dst\_host\_id}, \texttt{src\_mac}, \texttt{dst\_mac}, \texttt{payload\_size}\\
+\hline
+\texttt{frame\_path} & Хранит путь прохождения кадра через коммутаторы & \texttt{path\_id}, \texttt{frame\_id}, \texttt{switch\_id}, \texttt{in\_port\_id}, \texttt{out\_port\_id}, \texttt{step\_number}\\
+\hline
+\end{longtable}
+
+\section{Реализация структуры базы данных}
+
+Структура таблиц реализована в файле \texttt{sql/001\_init.sql}. Для каждой сущности задан первичный ключ. Межтабличные связи реализованы с помощью внешних ключей.
+
+\begin{lstlisting}[caption={Пример создания таблиц hosts и switches}]
+CREATE TABLE hosts (
+    host_id SERIAL PRIMARY KEY,
+    hostname VARCHAR(100) NOT NULL,
+    ip_address INET UNIQUE NOT NULL,
+    mac_address MACADDR UNIQUE NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE switches (
+    switch_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    model VARCHAR(100),
+    ports_count INT NOT NULL,
+    location VARCHAR(100),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+\end{lstlisting}
+
+Пример связи «коммутатор --- порт»:
+
+\begin{lstlisting}[caption={Порты коммутаторов}]
+CREATE TABLE switch_ports (
+    port_id SERIAL PRIMARY KEY,
+    switch_id INT NOT NULL REFERENCES switches(switch_id),
+    port_number INT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    speed_mbps INT NOT NULL,
+    UNIQUE (switch_id, port_number)
+);
+\end{lstlisting}
+
+\section{Ограничения целостности}
+
+Для обеспечения корректности данных реализованы ограничения \texttt{NOT NULL}, \texttt{UNIQUE}, \texttt{PRIMARY KEY}, \texttt{FOREIGN KEY} и дополнительные \texttt{CHECK}-ограничения.
+
+\begin{longtable}{|p{5cm}|p{9.5cm}|}
+\hline
+\textbf{Ограничение} & \textbf{Назначение}\\
+\hline
+\texttt{chk\_hosts\_status} & Разрешает только допустимые статусы хоста: \texttt{online}, \texttt{offline}, \texttt{maintenance}.\\
+\hline
+\texttt{chk\_switches\_ports\_count} & Запрещает создавать коммутатор с неположительным числом портов.\\
+\hline
+\texttt{chk\_switch\_ports\_status} & Ограничивает статус порта значениями \texttt{up}, \texttt{down}, \texttt{disabled}.\\
+\hline
+\texttt{chk\_switch\_ports\_speed} & Проверяет, что скорость порта больше нуля.\\
+\hline
+\texttt{chk\_frames\_hosts\_are\_different} & Запрещает отправку кадра от хоста самому себе.\\
+\hline
+\texttt{chk\_frames\_payload\_size} & Проверяет положительный размер полезной нагрузки кадра.\\
+\hline
+\texttt{chk\_frames\_delivery\_status} & Ограничивает статус доставки значениями \texttt{delivered}, \texttt{dropped}, \texttt{flooded}.\\
+\hline
+\end{longtable}
+
+\section{Индексы}
+
+Индексы используются для ускорения частых операций поиска, фильтрации, соединения таблиц и аналитики по времени.
+
+\begin{longtable}{|p{6cm}|p{8.5cm}|}
+\hline
+\textbf{Индекс} & \textbf{Обоснование}\\
+\hline
+\texttt{idx\_hosts\_status} & Ускоряет выборку хостов по статусу.\\
+\hline
+\texttt{idx\_switch\_ports\_switch\_id} & Ускоряет получение портов конкретного коммутатора.\\
+\hline
+\texttt{idx\_host\_connections\_host\_id} & Ускоряет поиск подключений конкретного хоста.\\
+\hline
+\texttt{idx\_host\_connections\_port\_id} & Ускоряет поиск подключений по порту.\\
+\hline
+\texttt{idx\_mac\_table\_mac\_address\_unique} & Обеспечивает уникальность MAC-адреса в MAC-таблице и ускоряет поиск.\\
+\hline
+\texttt{idx\_frames\_src\_host\_id} & Ускоряет отчеты по отправителям кадров.\\
+\hline
+\texttt{idx\_frames\_dst\_host\_id} & Ускоряет отчеты по получателям кадров.\\
+\hline
+\texttt{idx\_frames\_sent\_at} & Ускоряет аналитику по временным интервалам.\\
+\hline
+\texttt{idx\_frame\_path\_frame\_id} & Ускоряет трассировку пути конкретного кадра.\\
+\hline
+\end{longtable}
+
+Пример создания индексов:
+
+\begin{lstlisting}[caption={Индексы для таблиц frames и frame\_path}]
+CREATE INDEX IF NOT EXISTS idx_frames_src_host_id ON frames(src_host_id);
+CREATE INDEX IF NOT EXISTS idx_frames_dst_host_id ON frames(dst_host_id);
+CREATE INDEX IF NOT EXISTS idx_frames_sent_at ON frames(sent_at);
+CREATE INDEX IF NOT EXISTS idx_frame_path_frame_id ON frame_path(frame_id);
+\end{lstlisting}
+
+\section{Представления}
+
+В базе данных созданы представления, упрощающие выполнение типовых аналитических запросов.
+
+\begin{longtable}{|p{5cm}|p{9.5cm}|}
+\hline
+\textbf{Представление} & \textbf{Назначение}\\
+\hline
+\texttt{v\_active\_connections} & Показывает активные подключения хостов к портам коммутаторов.\\
+\hline
+\texttt{v\_switch\_mac\_table} & Показывает MAC-таблицу с названиями коммутаторов и номерами портов.\\
+\hline
+\texttt{v\_frame\_trace} & Показывает путь прохождения кадров через коммутаторы.\\
+\hline
+\texttt{v\_host\_traffic\_stats} & Сводит статистику отправленных и полученных кадров по хостам.\\
+\hline
+\end{longtable}
+
+\section{Функции и триггеры}
+
+Для реализации серверной логики используются функции PostgreSQL на SQL и PL/pgSQL.
+
+\begin{longtable}{|p{5.5cm}|p{9cm}|}
+\hline
+\textbf{Функция} & \textbf{Назначение}\\
+\hline
+\texttt{learn\_mac\_address(...)} & Добавляет или обновляет запись в MAC-таблице.\\
+\hline
+\texttt{register\_frame(...)} & Регистрирует кадр и автоматически создает запись о его пути.\\
+\hline
+\texttt{get\_frame\_trace(...)} & Возвращает трассировку конкретного кадра.\\
+\hline
+\texttt{get\_host\_traffic\_stats()} & Возвращает статистику трафика по хостам.\\
+\hline
+\texttt{get\_switch\_mac\_table(...)} & Возвращает MAC-таблицу указанного коммутатора.\\
+\hline
+\end{longtable}
+
+Пример функции регистрации кадра:
+
+\begin{lstlisting}[caption={Вызов функции регистрации кадра}]
+SELECT register_frame(1, 2, 'IPv4', 128, 'delivered') AS new_frame_id;
+\end{lstlisting}
+
+В функции \texttt{register\_frame} база данных сама находит активные подключения отправителя и получателя, получает их MAC-адреса и порты, создает запись в \texttt{frames}, затем создает запись в \texttt{frame\_path}.
+
+Триггеры:
+
+\begin{longtable}{|p{5.5cm}|p{9cm}|}
+\hline
+\textbf{Триггер} & \textbf{Назначение}\\
+\hline
+\texttt{trg\_validate\_frame\_hosts} & Проверяет, что MAC-адреса кадра соответствуют хостам-отправителю и получателю.\\
+\hline
+\texttt{trg\_learn\_src\_mac\_from\_frame} & После вставки кадра обновляет MAC-таблицу по MAC-адресу отправителя.\\
+\hline
+\texttt{trg\_validate\_frame\_path\_ports} & Проверяет, что входной и выходной порты пути принадлежат указанному коммутатору.\\
+\hline
+\end{longtable}
+
+\section{Тестовые данные}
+
+Тестовые данные находятся в файле \texttt{sql/002\_seed.sql}. В базу добавлены:
+\begin{itemize}
+    \item три хоста: две рабочие станции и сервер;
+    \item один коммутатор Core-Switch-01;
+    \item три порта коммутатора;
+    \item активные подключения двух рабочих станций;
+    \item начальная MAC-таблица;
+    \item пример переданного кадра и его путь.
+\end{itemize}
+
+Пример наполнения:
+
+\begin{lstlisting}[caption={Добавление хостов}]
+INSERT INTO hosts (hostname, ip_address, mac_address, status) VALUES
+('Workstation-01', '192.168.1.10', '00:50:56:c0:00:01', 'online'),
+('Workstation-02', '192.168.1.11', '00:50:56:c0:00:02', 'online'),
+('Server-Main', '192.168.1.200', '00:50:56:c0:00:ff', 'online');
+\end{lstlisting}
+
+\section{Функциональные SQL-запросы}
+
+Файл \texttt{sql/queries.sql} содержит 20 демонстрационных запросов. Они покрывают простые выборки, фильтрацию, соединения таблиц, агрегацию, \texttt{HAVING}, CTE, сортировку, ограничение результата, временную аналитику и оконные функции. Ниже приведены основные типы запросов.
+
+\subsection{Активные подключения}
+
+\begin{lstlisting}
+SELECT *
+FROM v_active_connections
+ORDER BY switch_id, port_number;
+\end{lstlisting}
+
+Запрос показывает, какие хосты подключены к каким портам коммутатора.
+
+\subsection{MAC-таблица коммутатора}
+
+\begin{lstlisting}
+SELECT *
+FROM get_switch_mac_table('Core-Switch-01');
+\end{lstlisting}
+
+Запрос возвращает MAC-таблицу указанного коммутатора.
+
+\subsection{Трассировка кадра}
+
+\begin{lstlisting}
+SELECT *
+FROM get_frame_trace(1);
+\end{lstlisting}
+
+Запрос показывает, через какой коммутатор и какие порты прошел конкретный кадр.
+
+\subsection{Статистика трафика по хостам}
+
+\begin{lstlisting}
+SELECT *
+FROM get_host_traffic_stats();
+\end{lstlisting}
+
+Запрос показывает количество и объем отправленных и полученных кадров по каждому хосту.
+
+\subsection{Запрос с HAVING}
+
+\begin{lstlisting}
+SELECT
+    h.hostname,
+    COUNT(f.frame_id) AS frames_sent,
+    SUM(f.payload_size) AS bytes_sent
+FROM hosts h
+JOIN frames f ON f.src_host_id = h.host_id
+GROUP BY h.hostname
+HAVING COUNT(f.frame_id) > 1
+ORDER BY frames_sent DESC;
+\end{lstlisting}
+
+Запрос выбирает только тех хостов, которые отправили больше одного кадра.
+
+\subsection{Запрос с CTE и LIMIT}
+
+\begin{lstlisting}
+WITH traffic_pairs AS (
+    SELECT
+        src.hostname AS src_hostname,
+        dst.hostname AS dst_hostname,
+        COUNT(*) AS frames_count,
+        SUM(f.payload_size) AS total_bytes
+    FROM frames f
+    JOIN hosts src ON src.host_id = f.src_host_id
+    JOIN hosts dst ON dst.host_id = f.dst_host_id
+    GROUP BY src.hostname, dst.hostname
+)
+SELECT *
+FROM traffic_pairs
+ORDER BY frames_count DESC, total_bytes DESC
+LIMIT 3;
+\end{lstlisting}
+
+Запрос строит рейтинг наиболее активных направлений передачи кадров.
+
+\subsection{Дополнительные запросы 13--20}
+
+Для расширения аналитического набора добавлены запросы, показывающие свободные ресурсы сети, распределение трафика, последние события и оконную нумерацию кадров.
+
+\begin{longtable}{|p{1.3cm}|p{7cm}|p{6cm}|}
+\hline
+\textbf{Номер} & \textbf{Назначение запроса} & \textbf{Используемые конструкции}\\
+\hline
+13 & Хосты без активного подключения к коммутатору & \texttt{LEFT JOIN}, \texttt{WHERE IS NULL}\\
+\hline
+14 & Свободные порты коммутаторов & \texttt{JOIN}, \texttt{LEFT JOIN}, фильтрация\\
+\hline
+15 & Количество кадров по статусам доставки & \texttt{GROUP BY}, \texttt{COUNT}, \texttt{SUM}\\
+\hline
+16 & Динамика трафика по дням & \texttt{DATE}, \texttt{GROUP BY}, \texttt{AVG}\\
+\hline
+17 & Последние 5 переданных кадров с именами хостов & \texttt{JOIN}, \texttt{ORDER BY}, \texttt{LIMIT}\\
+\hline
+18 & Утилизация портов коммутаторов & \texttt{GROUP BY}, агрегаты, вычисляемые поля\\
+\hline
+19 & MAC-адреса на портах без активного подключения & \texttt{LEFT JOIN}, \texttt{WHERE IS NULL}\\
+\hline
+20 & Нумерация кадров по каждому отправителю & \texttt{ROW\_NUMBER()}, \texttt{PARTITION BY}\\
+\hline
+\end{longtable}
+
+\section{Контейнеризация}
+
+Для запуска PostgreSQL используется Docker Compose. Конфигурация находится в файле \texttt{docker-compose.yml}.
+
+\begin{lstlisting}[caption={Фрагмент docker-compose.yml}]
+services:
+  postgres:
+    image: postgres:16
+    container_name: lan_traffic_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lan_traffic_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - ./sql/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
+      - ./sql/003_db_objects.sql:/docker-entrypoint-initdb.d/003_db_objects.sql:ro
+\end{lstlisting}
+
+Запуск проекта:
+
+\begin{lstlisting}[language=bash]
+docker compose up -d
+\end{lstlisting}
+
+Подключение к базе данных:
+
+\begin{lstlisting}[language=bash]
+docker exec -it lan_traffic_postgres psql -U postgres -d lan_traffic_db
+\end{lstlisting}
+
+Полная очистка контейнера и тома данных:
+
+\begin{lstlisting}[language=bash]
+docker compose down -v
+\end{lstlisting}
+
+\section{Проверка работоспособности}
+
+При проверке базы данных были получены следующие результаты:
+\begin{itemize}
+    \item создано 7 таблиц;
+    \item создано 4 представления;
+    \item создано 8 функций;
+    \item создано 3 триггера;
+    \item создано 26 индексов, включая системные индексы первичных и уникальных ключей;
+    \item демонстрационный файл \texttt{queries.sql} выполняется без ошибок.
+\end{itemize}
+
+Пример проверки списка таблиц:
+
+\begin{lstlisting}[language=bash]
+docker exec lan_traffic_postgres psql -U postgres -d lan_traffic_db -c "\dt"
+\end{lstlisting}
+
+Пример проверки функций:
+
+\begin{lstlisting}[language=bash]
+docker exec lan_traffic_postgres psql -U postgres -d lan_traffic_db -c "\df"
+\end{lstlisting}
+
+\section{Соответствие требованиям задания}
+
+\begin{longtable}{|p{8cm}|p{6.5cm}|}
+\hline
+\textbf{Требование} & \textbf{Выполнение}\\
+\hline
+Не менее 5 логически связанных таблиц & Реализовано 7 таблиц.\\
+\hline
+Первичные и внешние ключи & Реализованы во всех основных таблицах.\\
+\hline
+Тестовое наполнение & Реализовано в \texttt{sql/002\_seed.sql}.\\
+\hline
+Не менее 10 SQL-запросов & Реализовано 20 запросов в \texttt{sql/queries.sql}.\\
+\hline
+Ограничения \texttt{NOT NULL}, \texttt{UNIQUE}, \texttt{CHECK} & Реализованы в схеме и файле \texttt{003\_db\_objects.sql}.\\
+\hline
+Индексы & Реализованы индексы для связей, фильтрации и аналитики.\\
+\hline
+HAVING, CTE, ORDER BY LIMIT & Реализованы в демонстрационных запросах.\\
+\hline
+Docker Compose & Реализован запуск PostgreSQL через \texttt{docker-compose.yml}.\\
+\hline
+PL/pgSQL функции и триггеры & Реализованы функции и триггеры серверной логики.\\
+\hline
+\end{longtable}
+
+\section{Заключение}
+
+В ходе выполнения расчетно-графической работы была спроектирована и реализована база данных для учета сетевой топологии и передачи трафика в локальной сети. База данных позволяет хранить сведения о хостах, коммутаторах, портах, подключениях, MAC-таблице, Ethernet-кадрах и пути их прохождения.
+
+Реализованная схема содержит ограничения целостности, индексы для ускорения запросов, представления для аналитики, функции на SQL и PL/pgSQL, а также триггеры для контроля бизнес-правил и автоматического обновления MAC-таблицы. Для удобного запуска и проверки используется Docker Compose с автоматической инициализацией PostgreSQL.
+
+Разработанная база данных соответствует требованиям задания и может быть использована как учебная модель системы мониторинга и учета событий в локальной сети.
+
+\end{document}

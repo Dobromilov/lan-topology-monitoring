@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Отчет по РГР - Система учета сетевой топологии</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 20mm;
+    }
+
+    body {
+      font-family: "Noto Serif", "Times New Roman", serif;
+      font-size: 12pt;
+      line-height: 1.35;
+      color: #111;
+      background: #fff;
+    }
+
+    h1, h2, h3 {
+      font-family: "Noto Serif", "Times New Roman", serif;
+      page-break-after: avoid;
+    }
+
+    h1 {
+      font-size: 20pt;
+      margin: 0 0 18pt;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 16pt;
+      margin: 22pt 0 8pt;
+    }
+
+    h3 {
+      font-size: 14pt;
+      margin: 16pt 0 6pt;
+    }
+
+    p {
+      margin: 0 0 8pt;
+      text-align: justify;
+      text-indent: 1.25cm;
+    }
+
+    ul, ol {
+      margin-top: 4pt;
+      margin-bottom: 10pt;
+    }
+
+    li {
+      margin-bottom: 2pt;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8pt 0 14pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 5pt;
+      vertical-align: top;
+      font-size: 10.5pt;
+    }
+
+    th {
+      background: #f1f3f5;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    code {
+      font-family: "Noto Sans Mono", "DejaVu Sans Mono", monospace;
+      font-size: 10.5pt;
+    }
+
+    pre {
+      font-family: "Noto Sans Mono", "DejaVu Sans Mono", monospace;
+      font-size: 9.3pt;
+      line-height: 1.22;
+      border: 1px solid #333;
+      padding: 7pt;
+      white-space: pre-wrap;
+      margin: 7pt 0 12pt;
+      background: #fafafa;
+      page-break-inside: avoid;
+    }
+
+    .title-page {
+      height: 257mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      page-break-after: always;
+    }
+
+    .title-top {
+      font-size: 10pt;
+      line-height: 1.25;
+    }
+
+    .title-main {
+      margin-top: 35mm;
+      font-size: 14pt;
+      line-height: 1.45;
+    }
+
+    .title-main .report {
+      display: block;
+      font-size: 22pt;
+      font-weight: 700;
+      margin-bottom: 6pt;
+    }
+
+    .title-topic {
+      margin-top: 12mm;
+      font-size: 14pt;
+      font-weight: 700;
+    }
+
+    .title-meta {
+      width: 48%;
+      margin-left: auto;
+      text-align: left;
+      font-size: 12pt;
+      line-height: 1.35;
+    }
+
+    .title-city {
+      font-size: 12pt;
+    }
+
+    .toc {
+      page-break-after: always;
+    }
+
+    .toc p {
+      text-indent: 0;
+      text-align: left;
+      margin-bottom: 4pt;
+    }
+
+    .diagram {
+      page-break-inside: avoid;
+      margin: 10pt 0 16pt;
+      text-align: center;
+    }
+
+    .caption {
+      text-align: center;
+      font-size: 10.5pt;
+      margin-top: 4pt;
+      text-indent: 0;
+    }
+
+    .entity {
+      fill: #f8f9fa;
+      stroke: #222;
+      stroke-width: 1;
+    }
+
+    .section-page {
+      page-break-before: always;
+    }
+
+    .no-indent {
+      text-indent: 0;
+    }
+
+    .small {
+      font-size: 10.5pt;
+    }
+  </style>
+</head>
+<body>
+
+<section class="title-page">
+  <div>
+    <div class="title-top">
+      Министерство цифрового развития, связи и массовых коммуникаций РФ<br>
+      Федеральное государственное образовательное учреждение высшего образования<br>
+      «Сибирский государственный университет телекоммуникаций и информатики»<br>
+      (СибГУТИ)
+    </div>
+
+    <div class="title-main">
+      <span class="report">ОТЧЕТ</span>
+      по расчетно-графической работе<br>
+      по дисциплине «Базы данных»<br>
+      <strong>«Проектирование и реализация базы данных»</strong>
+    </div>
+
+    <div class="title-topic">
+      Тема:<br>
+      «Система учета сетевой топологии и передачи трафика в локальной сети»
+    </div>
+  </div>
+
+  <div class="title-meta">
+    <strong>Выполнили:</strong><br>
+    студенты группы ИКС-433<br>
+    Криволапов Н.<br>
+    Добромилов А.<br><br>
+
+    <strong>Проверил:</strong><br>
+    Брагин К.И.
+  </div>
+
+  <div class="title-city">
+    Новосибирск 2026
+  </div>
+</section>
+
+<section class="toc">
+  <h1>Содержание</h1>
+  <p>1. Цель работы</p>
+  <p>2. Описание предметной области</p>
+  <p>3. Логическая модель базы данных</p>
+  <p>4. Реализация структуры базы данных</p>
+  <p>5. Ограничения целостности</p>
+  <p>6. Индексы</p>
+  <p>7. Представления</p>
+  <p>8. Функции и триггеры</p>
+  <p>9. Тестовые данные</p>
+  <p>10. Функциональные SQL-запросы</p>
+  <p>11. Контейнеризация</p>
+  <p>12. Проверка работоспособности</p>
+  <p>13. Соответствие требованиям задания</p>
+  <p>14. Заключение</p>
+</section>
+
+<h2>1. Цель работы</h2>
+<p>Целью расчетно-графической работы является проектирование и реализация реляционной базы данных в СУБД PostgreSQL для предметной области, связанной с телекоммуникационными технологиями и IT-инфраструктурой.</p>
+<p>В рамках работы требуется описать предметную область, спроектировать структуру базы данных, реализовать таблицы, ключи и ограничения, добавить индексы, представления, функции и триггеры, подготовить тестовое наполнение и набор аналитических запросов.</p>
+
+<h2>2. Описание предметной области</h2>
+<p>В качестве предметной области выбрана система учета сетевой топологии и передачи трафика в локальной сети. Такая система может использоваться как часть NMS (Network Management System) для хранения информации об узлах сети, коммутаторах, портах, подключениях, MAC-таблице и событиях передачи Ethernet-кадров.</p>
+<p>В локальной сети рабочие станции и серверы подключаются к портам коммутаторов. Коммутатор выполняет пересылку Ethernet-кадров между портами, используя MAC-таблицу. MAC-таблица содержит сведения о том, какой MAC-адрес был замечен на каком порту. При передаче кадра система фиксирует отправителя, получателя, MAC-адреса, тип кадра, размер полезной нагрузки и путь прохождения кадра через сетевое оборудование.</p>
+
+<p class="no-indent">Основные автоматизируемые задачи:</p>
+<ul>
+  <li>ведение реестра сетевых хостов;</li>
+  <li>учет коммутаторов и их портов;</li>
+  <li>учет активных подключений хостов к портам;</li>
+  <li>хранение MAC-таблицы коммутаторов;</li>
+  <li>регистрация фактов передачи кадров;</li>
+  <li>хранение пути прохождения кадров через порты коммутаторов;</li>
+  <li>построение аналитических отчетов по топологии и трафику.</li>
+</ul>
+
+<h2>3. Логическая модель базы данных</h2>
+<p>База данных содержит семь основных таблиц: <code>hosts</code>, <code>switches</code>, <code>switch_ports</code>, <code>host_connections</code>, <code>mac_table</code>, <code>frames</code>, <code>frame_path</code>. Таблицы нормализованы: сведения о хостах, коммутаторах, портах, подключениях и событиях передачи хранятся отдельно и связываются внешними ключами.</p>
+
+<div class="diagram">
+  <svg width="1000" height="690" viewBox="0 0 1000 690" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+        <path d="M0,0 L10,4 L0,8 Z" fill="#222"/>
+      </marker>
+      <style>
+        .box-title{font:700 17px Noto Serif, serif}
+        .box-text{font:14px Noto Sans Mono, monospace}
+        .rel{stroke:#222;stroke-width:2;fill:none;marker-end:url(#arrow)}
+        .rel2{stroke:#555;stroke-width:1.8;fill:none;stroke-dasharray:6 4;marker-end:url(#arrow)}
+        .card{font:700 15px Noto Serif, serif;fill:#111}
+        .rel-label{font:12px Noto Sans Mono, monospace;fill:#111}
+        .legend{font:13px Noto Serif, serif;fill:#111}
+      </style>
+    </defs>
+
+    <rect class="entity" x="25" y="40" width="180" height="150" rx="8"/>
+    <text x="40" y="66" class="box-title">hosts</text>
+    <text x="40" y="92" class="box-text">PK host_id</text>
+    <text x="40" y="114" class="box-text">hostname</text>
+    <text x="40" y="136" class="box-text">ip_address</text>
+    <text x="40" y="158" class="box-text">mac_address</text>
+    <text x="40" y="180" class="box-text">status</text>
+
+    <rect class="entity" x="280" y="40" width="210" height="150" rx="8"/>
+    <text x="295" y="66" class="box-title">host_connections</text>
+    <text x="295" y="92" class="box-text">PK connection_id</text>
+    <text x="295" y="114" class="box-text">FK host_id</text>
+    <text x="295" y="136" class="box-text">FK port_id</text>
+    <text x="295" y="158" class="box-text">connected_at</text>
+    <text x="295" y="180" class="box-text">disconnected_at</text>
+
+    <rect class="entity" x="565" y="40" width="190" height="150" rx="8"/>
+    <text x="580" y="66" class="box-title">switch_ports</text>
+    <text x="580" y="92" class="box-text">PK port_id</text>
+    <text x="580" y="114" class="box-text">FK switch_id</text>
+    <text x="580" y="136" class="box-text">port_number</text>
+    <text x="580" y="158" class="box-text">status</text>
+    <text x="580" y="180" class="box-text">speed_mbps</text>
+
+    <rect class="entity" x="815" y="40" width="165" height="150" rx="8"/>
+    <text x="830" y="66" class="box-title">switches</text>
+    <text x="830" y="92" class="box-text">PK switch_id</text>
+    <text x="830" y="114" class="box-text">name</text>
+    <text x="830" y="136" class="box-text">model</text>
+    <text x="830" y="158" class="box-text">ports_count</text>
+    <text x="830" y="180" class="box-text">location</text>
+
+    <rect class="entity" x="565" y="250" width="190" height="150" rx="8"/>
+    <text x="580" y="276" class="box-title">mac_table</text>
+    <text x="580" y="302" class="box-text">PK entry_id</text>
+    <text x="580" y="324" class="box-text">FK port_id</text>
+    <text x="580" y="346" class="box-text">mac_address</text>
+    <text x="580" y="368" class="box-text">learned_at</text>
+    <text x="580" y="390" class="box-text">last_seen_at</text>
+
+    <rect class="entity" x="25" y="430" width="205" height="165" rx="8"/>
+    <text x="40" y="456" class="box-title">frames</text>
+    <text x="40" y="482" class="box-text">PK frame_id</text>
+    <text x="40" y="504" class="box-text">FK src_host_id</text>
+    <text x="40" y="526" class="box-text">FK dst_host_id</text>
+    <text x="40" y="548" class="box-text">src_mac, dst_mac</text>
+    <text x="40" y="570" class="box-text">payload_size</text>
+
+    <rect class="entity" x="310" y="430" width="215" height="165" rx="8"/>
+    <text x="325" y="456" class="box-title">frame_path</text>
+    <text x="325" y="482" class="box-text">PK path_id</text>
+    <text x="325" y="504" class="box-text">FK frame_id</text>
+    <text x="325" y="526" class="box-text">FK switch_id</text>
+    <text x="325" y="548" class="box-text">FK in_port_id</text>
+    <text x="325" y="570" class="box-text">FK out_port_id</text>
+    <text x="325" y="592" class="box-text">step_number</text>
+
+    <!-- host_connections.host_id -> hosts.host_id -->
+    <path class="rel" d="M280 108 L205 108"/>
+    <text x="212" y="100" class="card">1</text>
+    <text x="260" y="100" class="card">N</text>
+    <text x="214" y="130" class="rel-label">host_id</text>
+
+    <!-- host_connections.port_id -> switch_ports.port_id -->
+    <path class="rel" d="M490 132 L565 132"/>
+    <text x="498" y="124" class="card">N</text>
+    <text x="548" y="124" class="card">1</text>
+    <text x="500" y="154" class="rel-label">port_id</text>
+
+    <!-- switch_ports.switch_id -> switches.switch_id -->
+    <path class="rel" d="M755 108 L815 108"/>
+    <text x="764" y="100" class="card">N</text>
+    <text x="798" y="100" class="card">1</text>
+    <text x="760" y="130" class="rel-label">switch_id</text>
+
+    <!-- mac_table.port_id -> switch_ports.port_id -->
+    <path class="rel" d="M650 250 L650 190"/>
+    <text x="632" y="238" class="card">N</text>
+    <text x="632" y="206" class="card">1</text>
+    <text x="662" y="224" class="rel-label">port_id</text>
+
+    <!-- frames.src_host_id -> hosts.host_id -->
+    <path class="rel2" d="M80 430 C45 330 45 235 95 190"/>
+    <text x="57" y="414" class="card">N</text>
+    <text x="86" y="207" class="card">1</text>
+    <text x="24" y="310" class="rel-label">src_host_id</text>
+
+    <!-- frames.dst_host_id -> hosts.host_id -->
+    <path class="rel2" d="M175 430 C250 330 255 235 180 190"/>
+    <text x="184" y="414" class="card">N</text>
+    <text x="184" y="207" class="card">1</text>
+    <text x="205" y="310" class="rel-label">dst_host_id</text>
+
+    <!-- frame_path.frame_id -> frames.frame_id -->
+    <path class="rel" d="M310 502 L230 502"/>
+    <text x="292" y="494" class="card">N</text>
+    <text x="236" y="494" class="card">1</text>
+    <text x="242" y="524" class="rel-label">frame_id</text>
+
+    <!-- frame_path.switch_id -> switches.switch_id -->
+    <path class="rel" d="M525 500 C710 500 895 360 895 190"/>
+    <text x="536" y="493" class="card">N</text>
+    <text x="878" y="207" class="card">1</text>
+    <text x="720" y="455" class="rel-label">switch_id</text>
+
+    <!-- frame_path.in_port_id -> switch_ports.port_id -->
+    <path class="rel2" d="M420 430 C500 350 570 275 610 190"/>
+    <text x="428" y="416" class="card">N</text>
+    <text x="592" y="207" class="card">1</text>
+    <text x="492" y="320" class="rel-label">in_port_id</text>
+
+    <!-- frame_path.out_port_id -> switch_ports.port_id -->
+    <path class="rel2" d="M492 430 C585 355 700 280 705 190"/>
+    <text x="500" y="416" class="card">N</text>
+    <text x="710" y="207" class="card">1</text>
+    <text x="626" y="330" class="rel-label">out_port_id</text>
+
+    <rect x="25" y="628" width="950" height="42" rx="6" fill="#fff" stroke="#999"/>
+    <text x="42" y="653" class="legend">
+      Обозначения: стрелка идет от внешнего ключа к связанной таблице; 1 — одна родительская запись, N — много дочерних записей.
+    </text>
+  </svg>
+  <div class="caption">Рисунок 1 — ER-диаграмма базы данных с внешними ключами и кратностями связей</div>
+</div>
+
+<p class="no-indent">Связи между таблицами:</p>
+<table>
+  <tr><th>Дочерняя таблица и внешний ключ</th><th>Родительская таблица и первичный ключ</th><th>Кратность</th><th>Смысл связи</th></tr>
+  <tr><td><code>host_connections.host_id</code></td><td><code>hosts.host_id</code></td><td>N:1</td><td>Один хост может иметь несколько записей истории подключений.</td></tr>
+  <tr><td><code>host_connections.port_id</code></td><td><code>switch_ports.port_id</code></td><td>N:1</td><td>Один порт может встречаться в истории подключений.</td></tr>
+  <tr><td><code>switch_ports.switch_id</code></td><td><code>switches.switch_id</code></td><td>N:1</td><td>Один коммутатор содержит много портов.</td></tr>
+  <tr><td><code>mac_table.port_id</code></td><td><code>switch_ports.port_id</code></td><td>N:1</td><td>На одном порту может быть изучено несколько MAC-адресов.</td></tr>
+  <tr><td><code>frames.src_host_id</code></td><td><code>hosts.host_id</code></td><td>N:1</td><td>Хост может быть отправителем многих кадров.</td></tr>
+  <tr><td><code>frames.dst_host_id</code></td><td><code>hosts.host_id</code></td><td>N:1</td><td>Хост может быть получателем многих кадров.</td></tr>
+  <tr><td><code>frame_path.frame_id</code></td><td><code>frames.frame_id</code></td><td>N:1</td><td>Один кадр может иметь несколько шагов пути.</td></tr>
+  <tr><td><code>frame_path.switch_id</code></td><td><code>switches.switch_id</code></td><td>N:1</td><td>Один коммутатор может участвовать во многих шагах прохождения кадров.</td></tr>
+  <tr><td><code>frame_path.in_port_id</code></td><td><code>switch_ports.port_id</code></td><td>N:1</td><td>Порт может быть входным для многих шагов прохождения кадров.</td></tr>
+  <tr><td><code>frame_path.out_port_id</code></td><td><code>switch_ports.port_id</code></td><td>N:1</td><td>Порт может быть выходным для многих шагов прохождения кадров.</td></tr>
+</table>
+
+<h2>4. Реализация структуры базы данных</h2>
+<p>Структура таблиц реализована в файле <code>sql/001_init.sql</code>. Для каждой сущности задан первичный ключ. Межтабличные связи реализованы с помощью внешних ключей.</p>
+
+<table>
+  <tr><th>Таблица</th><th>Назначение</th><th>Ключевые поля</th></tr>
+  <tr><td><code>hosts</code></td><td>Конечные устройства сети</td><td><code>host_id</code>, <code>hostname</code>, <code>ip_address</code>, <code>mac_address</code>, <code>status</code></td></tr>
+  <tr><td><code>switches</code></td><td>Сетевые коммутаторы</td><td><code>switch_id</code>, <code>name</code>, <code>model</code>, <code>ports_count</code></td></tr>
+  <tr><td><code>switch_ports</code></td><td>Порты коммутаторов</td><td><code>port_id</code>, <code>switch_id</code>, <code>port_number</code>, <code>status</code>, <code>speed_mbps</code></td></tr>
+  <tr><td><code>host_connections</code></td><td>Подключения хостов к портам</td><td><code>connection_id</code>, <code>host_id</code>, <code>port_id</code>, <code>connected_at</code></td></tr>
+  <tr><td><code>mac_table</code></td><td>MAC-таблица коммутаторов</td><td><code>entry_id</code>, <code>port_id</code>, <code>mac_address</code>, <code>last_seen_at</code></td></tr>
+  <tr><td><code>frames</code></td><td>Факты передачи Ethernet-кадров</td><td><code>frame_id</code>, <code>src_host_id</code>, <code>dst_host_id</code>, <code>src_mac</code>, <code>dst_mac</code></td></tr>
+  <tr><td><code>frame_path</code></td><td>Путь кадра через сетевое оборудование</td><td><code>path_id</code>, <code>frame_id</code>, <code>switch_id</code>, <code>in_port_id</code>, <code>out_port_id</code></td></tr>
+</table>
+
+<pre>CREATE TABLE hosts (
+    host_id SERIAL PRIMARY KEY,
+    hostname VARCHAR(100) NOT NULL,
+    ip_address INET UNIQUE NOT NULL,
+    mac_address MACADDR UNIQUE NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE switch_ports (
+    port_id SERIAL PRIMARY KEY,
+    switch_id INT NOT NULL REFERENCES switches(switch_id),
+    port_number INT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    speed_mbps INT NOT NULL,
+    UNIQUE (switch_id, port_number)
+);</pre>
+
+<h2>5. Ограничения целостности</h2>
+<p>Для обеспечения корректности данных используются ограничения <code>NOT NULL</code>, <code>UNIQUE</code>, <code>PRIMARY KEY</code>, <code>FOREIGN KEY</code> и дополнительные <code>CHECK</code>-ограничения из файла <code>sql/003_db_objects.sql</code>.</p>
+
+<table>
+  <tr><th>Ограничение</th><th>Назначение</th></tr>
+  <tr><td><code>chk_hosts_status</code></td><td>Разрешает только статусы <code>online</code>, <code>offline</code>, <code>maintenance</code>.</td></tr>
+  <tr><td><code>chk_switches_ports_count</code></td><td>Запрещает неположительное количество портов у коммутатора.</td></tr>
+  <tr><td><code>chk_switch_ports_status</code></td><td>Ограничивает статус порта значениями <code>up</code>, <code>down</code>, <code>disabled</code>.</td></tr>
+  <tr><td><code>chk_switch_ports_speed</code></td><td>Проверяет, что скорость порта больше нуля.</td></tr>
+  <tr><td><code>chk_frames_hosts_are_different</code></td><td>Запрещает отправку кадра от хоста самому себе.</td></tr>
+  <tr><td><code>chk_frames_payload_size</code></td><td>Проверяет положительный размер полезной нагрузки.</td></tr>
+  <tr><td><code>chk_frames_delivery_status</code></td><td>Ограничивает статус доставки значениями <code>delivered</code>, <code>dropped</code>, <code>flooded</code>.</td></tr>
+  <tr><td><code>chk_frame_path_ports_are_different</code></td><td>Запрещает одинаковые входной и выходной порты для одного шага пути.</td></tr>
+</table>
+
+<h2>6. Индексы</h2>
+<p>Индексы ускоряют частые операции поиска, фильтрации и соединения таблиц. В базе созданы индексы для поиска по статусам, внешним ключам, времени отправки кадров и трассировке пути.</p>
+
+<table>
+  <tr><th>Индекс</th><th>Обоснование</th></tr>
+  <tr><td><code>idx_hosts_status</code></td><td>Ускоряет выборку хостов по статусу.</td></tr>
+  <tr><td><code>idx_switch_ports_switch_id</code></td><td>Ускоряет получение портов конкретного коммутатора.</td></tr>
+  <tr><td><code>idx_host_connections_host_id</code></td><td>Ускоряет поиск подключений конкретного хоста.</td></tr>
+  <tr><td><code>idx_host_connections_port_id</code></td><td>Ускоряет поиск подключений по порту.</td></tr>
+  <tr><td><code>idx_mac_table_mac_address_unique</code></td><td>Обеспечивает уникальность MAC-адреса и ускоряет поиск.</td></tr>
+  <tr><td><code>idx_frames_src_host_id</code></td><td>Ускоряет отчеты по отправителям кадров.</td></tr>
+  <tr><td><code>idx_frames_dst_host_id</code></td><td>Ускоряет отчеты по получателям кадров.</td></tr>
+  <tr><td><code>idx_frames_sent_at</code></td><td>Ускоряет аналитику по времени передачи.</td></tr>
+  <tr><td><code>idx_frame_path_frame_id</code></td><td>Ускоряет трассировку пути конкретного кадра.</td></tr>
+</table>
+
+<pre>CREATE INDEX IF NOT EXISTS idx_frames_src_host_id ON frames(src_host_id);
+CREATE INDEX IF NOT EXISTS idx_frames_dst_host_id ON frames(dst_host_id);
+CREATE INDEX IF NOT EXISTS idx_frames_sent_at ON frames(sent_at);
+CREATE INDEX IF NOT EXISTS idx_frame_path_frame_id ON frame_path(frame_id);</pre>
+
+<h2>7. Представления</h2>
+<table>
+  <tr><th>Представление</th><th>Назначение</th></tr>
+  <tr><td><code>v_active_connections</code></td><td>Показывает активные подключения хостов к портам коммутаторов.</td></tr>
+  <tr><td><code>v_switch_mac_table</code></td><td>Показывает MAC-таблицу с названиями коммутаторов и номерами портов.</td></tr>
+  <tr><td><code>v_frame_trace</code></td><td>Показывает путь прохождения кадров через коммутаторы.</td></tr>
+  <tr><td><code>v_host_traffic_stats</code></td><td>Сводит статистику отправленных и полученных кадров по хостам.</td></tr>
+</table>
+
+<h2>8. Функции и триггеры</h2>
+<p>Для реализации серверной логики используются функции PostgreSQL на SQL и PL/pgSQL. Функции автоматизируют обновление MAC-таблицы, регистрацию кадров и получение аналитических отчетов.</p>
+
+<table>
+  <tr><th>Функция</th><th>Назначение</th></tr>
+  <tr><td><code>learn_mac_address(...)</code></td><td>Добавляет или обновляет запись в MAC-таблице.</td></tr>
+  <tr><td><code>register_frame(...)</code></td><td>Регистрирует кадр и автоматически создает запись о его пути.</td></tr>
+  <tr><td><code>get_frame_trace(...)</code></td><td>Возвращает трассировку конкретного кадра.</td></tr>
+  <tr><td><code>get_host_traffic_stats()</code></td><td>Возвращает статистику трафика по хостам.</td></tr>
+  <tr><td><code>get_switch_mac_table(...)</code></td><td>Возвращает MAC-таблицу указанного коммутатора.</td></tr>
+</table>
+
+<pre>SELECT register_frame(1, 2, 'IPv4', 128, 'delivered') AS new_frame_id;</pre>
+
+<table>
+  <tr><th>Триггер</th><th>Назначение</th></tr>
+  <tr><td><code>trg_validate_frame_hosts</code></td><td>Проверяет, что MAC-адреса кадра соответствуют хостам.</td></tr>
+  <tr><td><code>trg_learn_src_mac_from_frame</code></td><td>После вставки кадра обновляет MAC-таблицу по адресу отправителя.</td></tr>
+  <tr><td><code>trg_validate_frame_path_ports</code></td><td>Проверяет, что входной и выходной порты пути принадлежат указанному коммутатору.</td></tr>
+</table>
+
+<h2>9. Тестовые данные</h2>
+<p>Тестовые данные находятся в файле <code>sql/002_seed.sql</code>. В базу добавлены три хоста, один коммутатор, три порта, активные подключения, начальная MAC-таблица, пример переданного кадра и путь кадра.</p>
+
+<pre>INSERT INTO hosts (hostname, ip_address, mac_address, status) VALUES
+('Workstation-01', '192.168.1.10', '00:50:56:c0:00:01', 'online'),
+('Workstation-02', '192.168.1.11', '00:50:56:c0:00:02', 'online'),
+('Server-Main', '192.168.1.200', '00:50:56:c0:00:ff', 'online');</pre>
+
+<h2>10. Функциональные SQL-запросы</h2>
+<p>Файл <code>sql/queries.sql</code> содержит 20 демонстрационных запросов. Они покрывают простые выборки, фильтрацию, соединения таблиц, агрегацию, <code>HAVING</code>, CTE, сортировку, ограничение результата, временную аналитику и оконные функции.</p>
+
+<h3>10.1 Активные подключения</h3>
+<pre>SELECT *
+FROM v_active_connections
+ORDER BY switch_id, port_number;</pre>
+
+<h3>10.2 MAC-таблица коммутатора</h3>
+<pre>SELECT *
+FROM get_switch_mac_table('Core-Switch-01');</pre>
+
+<h3>10.3 Трассировка кадра</h3>
+<pre>SELECT *
+FROM get_frame_trace(1);</pre>
+
+<h3>10.4 Статистика трафика</h3>
+<pre>SELECT *
+FROM get_host_traffic_stats();</pre>
+
+<h3>10.5 Запрос с HAVING</h3>
+<pre>SELECT
+    h.hostname,
+    COUNT(f.frame_id) AS frames_sent,
+    SUM(f.payload_size) AS bytes_sent
+FROM hosts h
+JOIN frames f ON f.src_host_id = h.host_id
+GROUP BY h.hostname
+HAVING COUNT(f.frame_id) > 1
+ORDER BY frames_sent DESC;</pre>
+
+<h3>10.6 Запрос с CTE и LIMIT</h3>
+<pre>WITH traffic_pairs AS (
+    SELECT
+        src.hostname AS src_hostname,
+        dst.hostname AS dst_hostname,
+        COUNT(*) AS frames_count,
+        SUM(f.payload_size) AS total_bytes
+    FROM frames f
+    JOIN hosts src ON src.host_id = f.src_host_id
+    JOIN hosts dst ON dst.host_id = f.dst_host_id
+    GROUP BY src.hostname, dst.hostname
+)
+SELECT *
+FROM traffic_pairs
+ORDER BY frames_count DESC, total_bytes DESC
+LIMIT 3;</pre>
+
+<h3>10.7 Дополнительные запросы 13-20</h3>
+<p>Для расширения аналитического набора добавлены запросы, показывающие свободные ресурсы сети, распределение трафика, последние события и оконную нумерацию кадров.</p>
+
+<table>
+  <tr><th>Номер</th><th>Назначение запроса</th><th>Используемые конструкции</th></tr>
+  <tr><td>13</td><td>Хосты без активного подключения к коммутатору</td><td><code>LEFT JOIN</code>, <code>WHERE IS NULL</code></td></tr>
+  <tr><td>14</td><td>Свободные порты коммутаторов</td><td><code>JOIN</code>, <code>LEFT JOIN</code>, фильтрация</td></tr>
+  <tr><td>15</td><td>Количество кадров по статусам доставки</td><td><code>GROUP BY</code>, <code>COUNT</code>, <code>SUM</code></td></tr>
+  <tr><td>16</td><td>Динамика трафика по дням</td><td><code>DATE</code>, <code>GROUP BY</code>, <code>AVG</code></td></tr>
+  <tr><td>17</td><td>Последние 5 переданных кадров с именами хостов</td><td><code>JOIN</code>, <code>ORDER BY</code>, <code>LIMIT</code></td></tr>
+  <tr><td>18</td><td>Утилизация портов коммутаторов</td><td><code>GROUP BY</code>, агрегаты, вычисляемые поля</td></tr>
+  <tr><td>19</td><td>MAC-адреса на портах без активного подключения</td><td><code>LEFT JOIN</code>, <code>WHERE IS NULL</code></td></tr>
+  <tr><td>20</td><td>Нумерация кадров по каждому отправителю</td><td><code>ROW_NUMBER()</code>, <code>PARTITION BY</code></td></tr>
+</table>
+
+<h2>11. Контейнеризация</h2>
+<p>Для запуска PostgreSQL используется Docker Compose. При первом старте контейнера автоматически выполняются SQL-файлы инициализации.</p>
+
+<pre>services:
+  postgres:
+    image: postgres:16
+    container_name: lan_traffic_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lan_traffic_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - ./sql/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
+      - ./sql/003_db_objects.sql:/docker-entrypoint-initdb.d/003_db_objects.sql:ro</pre>
+
+<p class="no-indent">Запуск проекта:</p>
+<pre>docker compose up -d</pre>
+
+<p class="no-indent">Подключение к базе:</p>
+<pre>docker exec -it lan_traffic_postgres psql -U postgres -d lan_traffic_db</pre>
+
+<p class="no-indent">Полная очистка контейнера и тома данных:</p>
+<pre>docker compose down -v</pre>
+
+<h2>12. Проверка работоспособности</h2>
+<p>В ходе проверки были созданы 7 таблиц, 4 представления, 8 функций, 3 триггера и 26 индексов, включая системные индексы первичных и уникальных ключей. Демонстрационный файл <code>queries.sql</code> выполняется без ошибок.</p>
+
+<pre>docker exec lan_traffic_postgres psql -U postgres -d lan_traffic_db -c "\dt"
+docker exec lan_traffic_postgres psql -U postgres -d lan_traffic_db -c "\df"
+docker exec lan_traffic_postgres psql -U postgres -d lan_traffic_db -f /tmp/queries.sql</pre>
+
+<h2>13. Соответствие требованиям задания</h2>
+<table>
+  <tr><th>Требование</th><th>Выполнение</th></tr>
+  <tr><td>Не менее 5 логически связанных таблиц</td><td>Реализовано 7 таблиц.</td></tr>
+  <tr><td>Первичные и внешние ключи</td><td>Реализованы во всех основных таблицах.</td></tr>
+  <tr><td>Тестовое наполнение</td><td>Реализовано в <code>sql/002_seed.sql</code>.</td></tr>
+  <tr><td>Не менее 10 SQL-запросов</td><td>Реализовано 20 запросов в <code>sql/queries.sql</code>.</td></tr>
+  <tr><td>Ограничения <code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code></td><td>Реализованы в SQL-скриптах.</td></tr>
+  <tr><td>Индексы</td><td>Реализованы для связей, фильтрации и аналитики.</td></tr>
+  <tr><td><code>HAVING</code>, CTE, <code>ORDER BY LIMIT</code></td><td>Присутствуют в демонстрационных запросах.</td></tr>
+  <tr><td>Docker Compose</td><td>Реализован запуск PostgreSQL через <code>docker-compose.yml</code>.</td></tr>
+  <tr><td>PL/pgSQL функции и триггеры</td><td>Реализованы функции и триггеры серверной логики.</td></tr>
+</table>
+
+<h2>14. Заключение</h2>
+<p>В ходе выполнения расчетно-графической работы была спроектирована и реализована база данных для учета сетевой топологии и передачи трафика в локальной сети. База данных позволяет хранить сведения о хостах, коммутаторах, портах, подключениях, MAC-таблице, Ethernet-кадрах и пути их прохождения.</p>
+<p>Реализованная схема содержит ограничения целостности, индексы для ускорения запросов, представления для аналитики, функции на SQL и PL/pgSQL, а также триггеры для контроля бизнес-правил и автоматического обновления MAC-таблицы. Для удобного запуска и проверки используется Docker Compose с автоматической инициализацией PostgreSQL.</p>
+<p>Разработанная база данных соответствует требованиям задания и может быть использована как учебная модель системы мониторинга и учета событий в локальной сети.</p>
+
+</body>
+</html>
