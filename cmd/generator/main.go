@@ -3,15 +3,20 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"time"
 
 	"lan-topology-monitoring/internal/config"
 	"lan-topology-monitoring/internal/db"
+	"lan-topology-monitoring/internal/models"
 )
 
 func main() {
+	shouldCreateTestFrame := flag.Bool("create-test-frame", false, "create one test frame and frame path")
+	flag.Parse()
+
 	cfg := config.Load()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -92,6 +97,36 @@ func main() {
 			connection.SpeedMbps,
 		)
 	}
+
+	if *shouldCreateTestFrame {
+		frameID, pathID, err := createTestFrame(ctx, database)
+		if err != nil {
+			log.Fatalf("failed to create test frame: %v", err)
+		}
+
+		fmt.Printf("Created frame #%d with path #%d\n", frameID, pathID)
+	}
+}
+
+func createTestFrame(ctx context.Context, database *sql.DB) (int, int, error) {
+	frame := models.Frame{
+		SrcHostID:      1,
+		DstHostID:      2,
+		SrcMAC:         "00:50:56:c0:00:01",
+		DstMAC:         "00:50:56:c0:00:02",
+		EtherType:      "IPv4",
+		PayloadSize:    128,
+		DeliveryStatus: "delivered",
+	}
+
+	path := models.FramePath{
+		SwitchID:   1,
+		InPortID:   1,
+		OutPortID:  2,
+		StepNumber: 1,
+	}
+
+	return db.CreateFrameWithPath(ctx, database, frame, path)
 }
 
 func nullableString(value sql.NullString) string {
